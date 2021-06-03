@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>WWH 마이페이지</title>
+<meta name="author" content="황수연">
+<meta name="discription" content="취향공유 웹사이트-마이페이지">
+<meta name="keywords" content="취향, 일상, 공유">
+
+<script>
+window.onload = function(){
+	//findUserIndex();
+	showMyPost();
+}
+</script>
+<style>
+th{
+	height:30px;
+}
+td{
+	text-align:center;
+}
+</style>
+</head>
+<body>
+	<table>
+		<thead style="width:100%;">
+			<tr><th style="width:5%;">No.</th><th style="width:10%;">게시판</th><th style="width:55%">제목</th><th style="width:30%;">날짜</th></tr>
+		</thead>
+		<tbody id="tbody">
+		
+		</tbody>
+	</table>
+
+
+
+<script>
+var userStr = localStorage.getItem("user");
+var userInfos = JSON.parse(userStr); // userInfos는 객체 배열
+var userIndex;
+var currentId = localStorage.getItem("currentId");
+
+function findUserIndex(){
+	// 현재 사용자 인덱스 찾기
+	for(var i=0;i<userInfos.length;i++){
+		if(userInfos[i].id == currentId){
+			userIndex = i;
+			break;
+		}
+	}
+}
+
+function showMyPost(){
+	var tbody = document.getElementById("tbody");
+	//var mypost = userInfos[userIndex].mypost;
+	var postList;
+	
+	//for(var i=mypost.length-1; i >= 0;i--){
+		// 게시판 종류
+		//postList = localStorage.getItem(mypost[i].key);
+		//var title = postList[mypost[i].title];
+		var title = "첫 글";
+		//var date = postList[mypost[i].date];
+		var date = "2021-06-04";
+		//setAttribute()
+		var tr = document.createElement("tr");
+		var td1 = document.createElement("td");
+		td1.style.width = "5%";
+		//td1.innerHTML = i + 1;
+		td1.innerHTML = 1;
+		var td2 = document.createElement("td");
+		td2.style.width = "10%";
+		//if(mypost[i].key == "postHobby") td2.innerHTML = "취미";
+		//else if(mypost[i].key == "postDaily") td2.innerHTML = "일상";
+		//else if(mypost[i].key == "postSuggest") td2.innerHTML = "건의사항";
+		td2.innerHTML = "취미";
+		var td3 = document.createElement("td");
+		td3.style.width = "55%";
+		td3.innerHTML = title;
+		var td4 = document.createElement("td");
+		td4.style.width = "30%";
+		td4.innerHTML = date;
+		var hr = document.createElement("hr");
+		tbody.appendChild(tr);
+		tr.appendChild(td1);
+		tr.appendChild(td2);
+		tr.appendChild(td3);
+		tr.appendChild(td4);
+		tr.appendChild(hr);
+	//}
+}
+</script>
+</body>
+</html>
