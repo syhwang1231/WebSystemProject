@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="login.css" type="text/css" rel="stylesheet">
+<link href="main.css" type="text/css" rel="stylesheet">
+<title>WWH 로그인</title>
+<meta name="author" content="황수연">
+<meta name="discription" content="취향공유 웹사이트-로그인">
+<meta name="keywords" content="취향, 일상, 공유">
+
+<script>
+window.onload = function (){
+	//checkCount();
+	checkLogStatus();
+}
+
+//localStorage에 저장된 JSON string을 읽어들임
+var userStr = localStorage.getItem("user");
+//object로 파싱 후 배열 리턴, userInfos에 저장
+var userInfos = JSON.parse(userStr);
+
+function checkLogStatus(){
+	var logInButton = document.getElementById("logInButton");
+	// 로그인 상태인데 로그인버튼(로그아웃) 누른 경우 
+	if(localStorage.getItem("login") == "true"){
+		logInButton.innerHTML == "로그인";
+		localStorage.setItem("login","false");
+		alert("로그아웃 성공");
+		var newWin = window.open("/temp/main.html", "_self");
+		return;
+	}
+	// 로그아웃 상태인데 로그인버튼(로그인) 누른 경우
+	else{
+		localStorage.setItem("login","false");
+		showId();
+	}
+}
+//로그인 함수
+function logIn(){
+	if(!window.localStorage){
+		alert("로컬스토리지 미지원");
+		return;
+	}
+
+	//입력폼에서 아이디,비밀번호 가져오기
+	var id = document.getElementById("id").value;
+	var pw = document.getElementById("pw").value;
+	
+	//입력창이 빈 경우
+	if(id == "" || pw == ""){
+		alert("아이디나 비밀번호를 입력하세요");
+		return;
+	}
+
+	//아이디 저장하기 체크박스가 체크된 경우
+	if(document.getElementById("saveId").checked){
+		setCookie("saveId",id,null);
+	}
+	
+	//로컬스토리지에서 아이디, 비밀번호 찾기
+	for(var i=0;i<userInfos.length;i++){
+		if(userInfos[i].id == id){
+			// 로그인 성공
+			//아이디와 비밀번호 모두 일치하면 로그인 상태 true로 저장
+			if(userInfos[i].pw == pw){
+				localStorage.setItem("login",true);
+				localStorage.setItem("currentId",id);
+				alert("로그인 성공");
+				// 메인 페이지로 돌아가기
+				var newWin = window.open("/temp/main.html", "_self");
+				
+			}
+			else{
+				login_count++;
+				alert("로그인 정보가 틀립니다. 로그인 오류 횟수("+login_count+"/5)");
+				checkCount();
+				return;
+			}
+		}
+		else {
+			login_count++;
+			alert("로그인 정보가 틀립니다. 로그인 오류 횟수("+login_count+"/5)");
+			checkCount();
+			return;
+		}
+	}
+	
+	//아이디, 비밀번호 입력창 비우기
+	document.getElementById("id").value = "";
+	document.getElementById("pw").value = "";
+}
+
+//새로운 쿠키 저장
+function setCookie(name,value,expireDate){
+	var cookieStr = name + "=" + escape(value) + 
+		((expireDate == null)?"":("; expires="+expireDate.toGMTString()));
+	document.cookie = cookieStr;
+}
+
+//저장된 쿠키의 value 가져오기
+function getCookie(name){
+	var pairs = document.cookie.split(";");
+	
+	for(var i=0;i<pairs.length;i++){
+		var pair = pairs[i].trim();
+		var unit = pair.split("=");
+		//저장된 쿠키(아이디)가 있으면 아이디 리턴
+		if(unit[0] == name) 	//unit[0]은 쿠키의 name
+			return unescape(unit[1]);
+	}
+	//저장된 쿠키(아이디)가 없으면 null 리턴
+	return null;
+}
+
+//로그인 페이지 새로 띄울 때 
+function showId(){
+	var idCookie = getCookie("saveId");
+	//쿠키에 저장된 아이디가 있으면
+	if(idCookie != null){
+		var idInput = document.getElementById("id");
+		idInput.value = idCookie;
+	}
+}
+
+// 로그인 횟수 제한, countdown
+var login_count = 0;
+var timerID=null;
+var countDown=10;  // 3분
+
+
+function checkCount(){
+	if(login_count >= 5){
+		startTimer();
+	}
+	else{
+		return;
+	}
+}
+function startTimer() {
+	var clock = document.getElementById("clock");
+	var logIn = document.getElementById("login");
+	//로그인 버튼 못 누르게
+	logIn.onclick = "";
+	countDown = 10;
+	clock.innerHTML = countDown+"초 뒤에 로그인 할 수 있습니다.";
+	
+	//timer가 있었으면 제거
+	if(timerID != null)
+		clearTimeout(timerID);
+	//timeout(obj) function call
+	timeout(clock);
+}
+
+function timeout(obj) {
+	//countdown
+	countDown--;
+	//남은시간 보여주기
+	obj.innerHTML = countDown+"초 뒤에 로그인 할 수 있습니다.";
+	
+	//180초 지났으면
+	if(countDown < 1){
+		login_count = 0;
+		obj.innerHTML = "";
+		var logIn = document.getElementById("login");
+		logIn.onclick = "logIn()";
+		return;
+	}
+	//아직 안 지났으면 -> timer setting(1s)
+	else
+		timerID = setTimeout("timeout(clock)",1000);
+}
+</script>
+</head>
+
+<body>
+<header>
+    <h1><span><a href="main.html">WWH</a></span></h1>
+    <nav>
+	<ul>
+		<li><a href="#"> 취미 </a></li>
+		<li><a href="#"> 일상 </a></li>
+		<li><a href="#"> 건의사항 </a></li>
+		<li><a href="myPage.html"> 마이페이지 </a></li>
+		<li style="font-size:22px; margin-top:5px;" id="logInButton"><a href="login.html"> 로그인 </a></li>
+	</ul>
+</nav>
+</header>
+
+<section>
+	<h1>로그인</h1>
+	<form style="text-align:center">
+		<input id="id" type="text" placeholder="Username">
+		<br><br>
+		<input id="pw" type="password" placeholder="Password">
+		<br>
+		<input id="saveId" type="checkbox"><span>아이디 저장하기</span>
+		
+		<span><a href="sign-up.html">회원가입</a> 하러가기</span>
+		<br>
+		<span id="clock"></span>
+		<br>
+		<input type="button" id="login" onclick="logIn()" value="Login">
+	</form>
+</section>
+</body>
+</html>
