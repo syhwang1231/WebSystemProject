@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>WWH 마이페이지</title>
+<meta name="author" content="황수연">
+<meta name="discription" content="취향공유 웹사이트-마이페이지">
+<meta name="keywords" content="취향, 일상, 공유">
+
+<script>
+window.onload = function(){
+	findUserIndex();
+	showInfo();
+}
+</script>
+</head>
+<body>
+<div style="text-align:center; margin-top:50px;">
+	<span><b>아이디</b>    <input type="text" id="editId" value=" "></span><br><br>
+	<span><b>이메일</b>    <input type="email" id="editEmail" value=" "></span><br><br>
+	<span><b>한 줄 소개</b>    <input type="text" id="editIntro" value=" "></span><br><br>
+	<br>
+	<input type="button" id="editInfo" value="수정하기" onclick="confirmEdit()">
+</div>
+
+<script>
+var showId = document.getElementById("editId");
+var showEmail = document.getElementById("editEmail");
+var showIntro = document.getElementById("editIntro");
+var userStr = localStorage.getItem("user");
+var userInfos = JSON.parse(userStr); // userInfos는 객체 배열
+var userIndex;
+var currentId = localStorage.getItem("currentId");
+
+function findUserIndex(){
+	// 현재 사용자 인덱스 찾기
+	for(var i=0;i<userInfos.length;i++){
+		if(userInfos[i].id == currentId){
+			userIndex = i;
+			break;
+		}
+	}
+}
+
+function showInfo(){
+	showId.value = userInfos[userIndex].id;
+	showEmail.value = userInfos[userIndex].email;
+	showIntro.value = userInfos[userIndex].intro;
+}
+
+function confirmEdit(){
+	userInfos[userIndex].id = showId.value;
+	userInfos[userIndex].email = showEmail.value;
+	userInfos[userIndex].intro = showIntro.value;
+	
+	localStorage.setItem("user",JSON.stringify(userInfos));
+	alert("회원 정보 수정 완료");
+}
+</script>
+</body>
+</html>
